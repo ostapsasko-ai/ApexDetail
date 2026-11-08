@@ -1,0 +1,12 @@
+node_modules/
+.next/
+.env
+.env.local
+*.log
+coverage/
+dist/
+.superpowers/
+outputs/*.zip
+work/
+public/generated/*.tmp
+*.tsbuildinfo

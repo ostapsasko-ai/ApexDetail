@@ -1,0 +1,26 @@
+"use client";
+
+import { CreditCard, LoaderCircle, MapPin, PackageCheck, Truck } from "lucide-react";
+import { useMemo, useState } from "react";
+import { useCart } from "@/components/cart/cart-provider";
+import { SHIPPING_METHODS, type ShippingMethodId } from "@/lib/checkout";
+import { formatPln } from "@/lib/pricing";
+import { PickupMap, type PickupPoint } from "./pickup-map";
+
+export function CheckoutForm() {
+  const { items, totals } = useCart();
+  const [shippingMethod, setShippingMethod] = useState<ShippingMethodId | "">(""); const [pickupPoint, setPickupPoint] = useState<PickupPoint | null>(null); const [submitting, setSubmitting] = useState(false); const [message, setMessage] = useState(""); const [error, setError] = useState("");
+  const selectedShipping = SHIPPING_METHODS.find(({ id }) => id === shippingMethod);
+  const grandTotal = useMemo(() => totals.subtotal + (selectedShipping?.price ?? 0), [selectedShipping, totals.subtotal]);
+
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault(); setSubmitting(true); setMessage(""); setError(""); const form = new FormData(event.currentTarget);
+    const payload = { customerName: form.get("customerName"), email: form.get("email"), phone: form.get("phone"), consent: form.get("consent") === "on", items: items.map((item) => ({ id: item.id.replace(/^product-|^service-/, ""), kind: item.kind, quantity: item.kind === "service" ? 1 : item.quantity, ...(item.kind === "service" ? { vehicle: item.vehicle } : {}) })), ...(totals.needsShipping ? { shippingMethod, ...(selectedShipping?.type === "courier" ? { address: { street: form.get("street"), postalCode: form.get("postalCode"), city: form.get("city"), country: "PL" } } : { pickupPoint }) } : {}) };
+    try { const response = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }); const data = await response.json(); if (!response.ok) throw new Error(data.error ?? "Nie udało się rozpocząć płatności."); if (data.mode === "demo") setMessage(data.message); else if (data.url) window.location.assign(data.url); }
+    catch (cause) { setError(cause instanceof Error ? cause.message : "Nie udało się rozpocząć płatności."); } finally { setSubmitting(false); }
+  }
+
+  if (!items.length) return <div className="surface"><h2>Nie ma czego zamawiać.</h2><p className="muted">Dodaj produkt lub usługę do koszyka.</p></div>;
+  return <form className="checkout-form" onSubmit={submit}><div className="checkout-main"><section><h2>Dane kontaktowe</h2><div className="form-grid"><label className="field field--wide"><span>Imię i nazwisko</span><input name="customerName" autoComplete="name" required /></label><label className="field"><span>E-mail</span><input name="email" type="email" autoComplete="email" required /></label><label className="field"><span>Telefon</span><input name="phone" type="tel" autoComplete="tel" required /></label></div></section>{totals.needsShipping && <section><h2>Dostawa produktów</h2><div className="shipping-grid">{SHIPPING_METHODS.map((method) => <button type="button" key={method.id} className={shippingMethod === method.id ? "is-active" : ""} onClick={() => { setShippingMethod(method.id); setPickupPoint(null); }}>{method.type === "pickup" ? <MapPin /> : <Truck />}<span>{method.name}</span><strong>{formatPln(method.price)}</strong></button>)}</div>{selectedShipping?.type === "courier" && <div className="form-grid mt-5"><label className="field field--wide"><span>Ulica i numer</span><input name="street" required /></label><label className="field"><span>Kod pocztowy</span><input name="postalCode" pattern="[0-9]{2}-[0-9]{3}" required /></label><label className="field"><span>Miasto</span><input name="city" required /></label></div>}{selectedShipping?.type === "pickup" && <PickupMap selected={pickupPoint} onSelect={setPickupPoint} />}</section>}<section><h2>Płatność</h2><div className="payment-note"><CreditCard /><div><strong>Bezpieczny Stripe Checkout</strong><p>Visa, Mastercard i ręczne wprowadzenie karty. Apple Pay oraz Google Pay pojawią się wyłącznie na obsługiwanym urządzeniu i w obsługiwanej przeglądarce.</p></div></div><label className="consent"><input name="consent" type="checkbox" required /><span>Akceptuję przetwarzanie danych w celu realizacji zamówienia i zapoznałem/am się z informacją RODO.</span></label>{message && <div className="demo-result" role="status"><PackageCheck /><span>{message}</span></div>}{error && <p className="form-error" role="alert">{error}</p>}</section></div><aside className="order-summary"><p className="eyebrow">Podsumowanie</p>{items.map((item) => <div key={item.id}><span>{item.name} × {item.quantity}</span><strong>{formatPln(item.unitPrice * item.quantity)}</strong></div>)}{selectedShipping && <div><span>{selectedShipping.name}</span><strong>{formatPln(selectedShipping.price)}</strong></div>}<div className="order-summary__total"><span>Razem</span><strong>{formatPln(grandTotal)}</strong></div><button className="button" type="submit" disabled={submitting || (totals.needsShipping && !shippingMethod)}>{submitting ? <><LoaderCircle className="animate-spin" /> Przekierowuję…</> : "Przejdź do bezpiecznej płatności"}</button><small>W trybie demonstracyjnym karta nie zostanie obciążona.</small></aside></form>;
+}
+
