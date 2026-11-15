@@ -36,8 +36,8 @@ export function CartDrawer() {
           {PARTICLES.map((particle, index) => (
             <span
               key={index}
-              className="absolute rounded-full bg-white/55 shadow-[0_0_8px_rgba(255,255,255,0.7)] motion-safe:animate-pulse"
-              style={{ left: particle.left, top: particle.top, width: particle.size, height: particle.size, animationDelay: particle.delay, animationDuration: particle.duration }}
+              className="absolute rounded-full bg-white/70 shadow-[0_0_10px_rgba(239,35,49,0.9)]"
+              style={{ left: particle.left, top: particle.top, width: particle.size + 1, height: particle.size + 1, animation: `cartParticle ${particle.duration} ease-in-out ${particle.delay} infinite` }}
             />
           ))}
         </div>
@@ -58,6 +58,17 @@ export function CartDrawer() {
           <div className="cart-total"><span>Razem</span><strong>{formatPln(totals.subtotal)}</strong></div>
           <Link href="/zamowienie" className={`button ${items.length ? "" : "is-disabled"}`} onClick={() => setOpen(false)}>Przejdź do zamówienia</Link>
         </footer>
+        <style jsx>{`
+          @keyframes cartParticle {
+            0% { transform: translate3d(0, 36px, 0) scale(.65); opacity: 0; }
+            18% { opacity: .9; }
+            52% { transform: translate3d(20px, -12px, 0) scale(1.2); opacity: .75; }
+            100% { transform: translate3d(-14px, -76px, 0) scale(.4); opacity: 0; }
+          }
+          @media (prefers-reduced-motion: reduce) {
+            span { animation: none !important; }
+          }
+        `}</style>
       </aside>
     </div>
   );
