@@ -19,7 +19,7 @@ export function WheelCart() {
       aria-label={`Otwórz koszyk, liczba pozycji: ${totals.itemCount}`}
       onClick={driveToCart}
       disabled={isDriving}
-      animate={{ x: isDriving ? [0, 90, 260] : 0, y: isDriving ? [0, -7, 0] : 0, opacity: isDriving ? [1, 1, 0] : 1 }}
+      animate={{ x: 0, y: isDriving ? [0, -3, 0, -2, 0] : 0, scale: isDriving ? [1, 1.06, 1, 1.04, 1] : 1, opacity: 1 }}
       transition={{ duration: .72, ease: [0.22, 1, 0.36, 1] }}
       onAnimationComplete={() => {
         if (!isDriving) return;
