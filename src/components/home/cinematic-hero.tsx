@@ -216,12 +216,12 @@ export function CinematicHero() {
         ))}
       </div>
 
-      <div className="shell cinematic-hero__inner !max-w-none !px-[clamp(1.25rem,3vw,4rem)]">
+      <div className="shell cinematic-hero__inner !max-w-none !px-0">
         <div className="cinematic-hero__content !w-full !max-w-none">
           <p className="eyebrow cinematic-hero__eyebrow">Warszawa · studio ochrony i renowacji</p>
           <h1 id="cinematic-hero-heading" className="cinematic-hero__title !w-full !max-w-none !text-[clamp(4.5rem,10.5vw,12rem)] !leading-[0.78]" aria-label={HERO_LABEL}>
             {HERO_LINES.map((line, lineIndex) => (
-              <span key={line} data-hero-line={lineIndex + 1} aria-hidden="true" className="cinematic-hero__line">
+              <span key={line} data-hero-line={lineIndex + 1} aria-hidden="true" className="cinematic-hero__line !flex !w-full !justify-between">
                 {Array.from(line).map((character, charIndex) => {
                   const glyphIndex = HERO_LINES.slice(0, lineIndex).join("").length + charIndex;
                   return (
