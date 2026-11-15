@@ -17,6 +17,14 @@
     "db:seed": "tsx prisma/seed.ts",
     "check": "pnpm test && pnpm typecheck && pnpm lint && pnpm build"
   },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "esbuild",
+      "prisma"
+    ]
+  },
   "dependencies": {
     "@prisma/client": "^6.19.0",
     "bcryptjs": "^3.0.2",
@@ -50,3 +58,4 @@
     "vitest": "^3.2.4"
   }
 }
+
