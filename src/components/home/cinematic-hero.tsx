@@ -221,7 +221,7 @@ export function CinematicHero() {
           <p className="eyebrow cinematic-hero__eyebrow">Warszawa · studio ochrony i renowacji</p>
           <h1 id="cinematic-hero-heading" className="cinematic-hero__title !w-full !max-w-none !text-[clamp(4.5rem,10.5vw,12rem)] !leading-[0.78]" aria-label={HERO_LABEL}>
             {HERO_LINES.map((line, lineIndex) => (
-              <span key={line} data-hero-line={lineIndex + 1} aria-hidden="true" className="cinematic-hero__line !flex !w-full !justify-between">
+              <span key={line} data-hero-line={lineIndex + 1} aria-hidden="true" className="cinematic-hero__line !flex !w-full !justify-center !gap-[0.04em]">
                 {Array.from(line).map((character, charIndex) => {
                   const glyphIndex = HERO_LINES.slice(0, lineIndex).join("").length + charIndex;
                   return (
