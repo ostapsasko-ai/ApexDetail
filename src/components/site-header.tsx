@@ -7,7 +7,7 @@ import { NAV_ITEMS } from "@/lib/navigation";
 import { WheelCart } from "@/components/cart/wheel-cart";
 
 const PRIMARY_ITEMS = NAV_ITEMS.filter(({ href }) =>
-  ["/uslugi", "/kalkulator", "/rezerwacja", "/sklep", "/galeria", "/kontakt"].includes(href)
+  ["/uslugi", "/kalkulator", "/rezerwacja", "/sklep", "/galeria", "/opinie", "/kontakt"].includes(href)
 );
 
 export function SiteHeader() {
@@ -55,4 +55,5 @@ export function SiteHeader() {
     </header>
   );
 }
+
 
