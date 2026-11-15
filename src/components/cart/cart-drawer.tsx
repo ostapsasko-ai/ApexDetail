@@ -6,6 +6,14 @@ import { useEffect } from "react";
 import { formatPln } from "@/lib/pricing";
 import { useCart } from "./cart-provider";
 
+const PARTICLES = Array.from({ length: 42 }, (_, index) => ({
+  left: `${(index * 37 + 11) % 100}%`,
+  top: `${(index * 61 + 7) % 100}%`,
+  size: 1 + (index % 3),
+  delay: `${-((index * 0.37) % 4)}s`,
+  duration: `${2.8 + (index % 5) * 0.65}s`
+}));
+
 export function CartDrawer() {
   const { items, totals, open, setOpen, removeItem, setQuantity } = useCart();
 
@@ -23,9 +31,18 @@ export function CartDrawer() {
   if (!open) return null;
   return (
     <div className="cart-overlay" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setOpen(false); }}>
-      <aside className="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cart-title">
-        <header><div><p className="eyebrow">Koło zakupów</p><h2 id="cart-title">Twój koszyk</h2></div><button type="button" aria-label="Zamknij koszyk" onClick={() => setOpen(false)}><X /></button></header>
-        <div className="cart-drawer__body">
+      <aside className="cart-drawer relative overflow-hidden" role="dialog" aria-modal="true" aria-labelledby="cart-title">
+        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden bg-[radial-gradient(circle_at_50%_35%,rgba(239,35,49,0.12),transparent_58%)]" aria-hidden="true">
+          {PARTICLES.map((particle, index) => (
+            <span
+              key={index}
+              className="absolute rounded-full bg-white/55 shadow-[0_0_8px_rgba(255,255,255,0.7)] motion-safe:animate-pulse"
+              style={{ left: particle.left, top: particle.top, width: particle.size, height: particle.size, animationDelay: particle.delay, animationDuration: particle.duration }}
+            />
+          ))}
+        </div>
+        <header className="relative z-10"><div><p className="eyebrow">Koło zakupów</p><h2 id="cart-title">Twój koszyk</h2></div><button type="button" aria-label="Zamknij koszyk" onClick={() => setOpen(false)}><X /></button></header>
+        <div className="cart-drawer__body relative z-10">
           {items.length === 0 ? <div className="empty-state"><ShoppingBag /><h3>Koszyk czeka na pierwszy wybór.</h3><p>Dodaj usługę z kalkulatora albo produkt ze sklepu.</p><Link href="/sklep" className="button" onClick={() => setOpen(false)}>Przejdź do sklepu</Link></div> : items.map((item) => (
             <article className="cart-line" key={item.id}>
               <div><span className="cart-line__kind">{item.kind === "service" ? "Usługa" : "Produkt"}</span><h3>{item.name}</h3>{item.vehicle && <small>Nadwozie: {item.vehicle}</small>}</div>
@@ -35,7 +52,7 @@ export function CartDrawer() {
             </article>
           ))}
         </div>
-        <footer>
+        <footer className="relative z-10">
           <div><span>Suma usług</span><strong>{formatPln(totals.serviceSubtotal)}</strong></div>
           <div><span>Suma produktów</span><strong>{formatPln(totals.productSubtotal)}</strong></div>
           <div className="cart-total"><span>Razem</span><strong>{formatPln(totals.subtotal)}</strong></div>
